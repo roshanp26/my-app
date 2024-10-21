@@ -5,7 +5,10 @@ const mockApiLogin = (username, password) => {
   return new Promise((resolve, reject) => {
     // Simulating an API call
     setTimeout(() => {
-      if (username === 'user' && password === 'password') {
+      const envUsername = process.env.REACT_APP_USERNAME;
+      const envPassword = process.env.REACT_APP_PASSWORD;
+
+      if (username === envUsername && password === envPassword) {
         resolve({ success: true, token: 'mock_token' });
       } else {
         reject(new Error('Invalid credentials'));
@@ -33,11 +36,20 @@ const App = () => {
     }
   };
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUsername('');
+    setPassword('');
+  };
+
   return (
     <div style={{ padding: '20px' }}>
-      <h2>Login</h2>
+      <h2>{isLoggedIn ? 'Welcome!' : 'Login'}</h2>
       {isLoggedIn ? (
-        <h3>Welcome, {username}!</h3>
+        <>
+          <h3>Welcome, {username}!</h3>
+          <button onClick={handleLogout}>Logout</button>
+        </>
       ) : (
         <form onSubmit={handleLogin}>
           <div>
