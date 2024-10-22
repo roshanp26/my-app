@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 // Mock API function
 const mockApiLogin = (username, password) => {
   return new Promise((resolve, reject) => {
-    // Simulating an API call
     setTimeout(() => {
       const envUsername = process.env.REACT_APP_USERNAME;
       const envPassword = process.env.REACT_APP_PASSWORD;
@@ -32,7 +31,7 @@ const App = () => {
       const response = await mockApiLogin(username, password);
       if (response.success) {
         setIsLoggedIn(true);
-        fetchNews(); // Fetch news after successful login
+        fetchNews(); // Call fetchNews after successful login
       }
     } catch (err) {
       setError(err.message);
@@ -48,11 +47,11 @@ const App = () => {
 
   const fetchNews = async () => {
     try {
-      const apiKey = process.env.REACT_APP_NEWS_API_KEY; // Make sure to set this in your .env
+      const apiKey = process.env.REACT_APP_NEWS_API_KEY; // Ensure this is set in your .env
       const response = await axios.get(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`);
       setNewsArticles(response.data.articles);
     } catch (err) {
-      setError('Failed to fetch news articles.');
+      setError('Failed to fetch news articles: ' + err.message);
     }
   };
 
