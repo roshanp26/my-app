@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 // Mock API function
 const mockApiLogin = (username, password) => {
@@ -22,6 +23,7 @@ const App = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [newsArticles, setNewsArticles] = useState([]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -30,6 +32,7 @@ const App = () => {
       const response = await mockApiLogin(username, password);
       if (response.success) {
         setIsLoggedIn(true);
+        fetchNews(); // Fetch news after successful login
       }
     } catch (err) {
       setError(err.message);
@@ -40,6 +43,17 @@ const App = () => {
     setIsLoggedIn(false);
     setUsername('');
     setPassword('');
+    setNewsArticles([]); // Clear news articles on logout
+  };
+
+  const fetchNews = async () => {
+    try {
+      const apiKey = process.env.REACT_APP_NEWS_API_KEY; // Make sure to set this in your .env
+      const response = await axios.get(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`);
+      setNewsArticles(response.data.articles);
+    } catch (err) {
+      setError('Failed to fetch news articles.');
+    }
   };
 
   return (
@@ -49,6 +63,18 @@ const App = () => {
         <>
           <h3>Welcome, {username}!</h3>
           <button onClick={handleLogout}>Logout</button>
+          <h2>News Articles</h2>
+          {newsArticles.length > 0 ? (
+            <ul>
+              {newsArticles.map((article, index) => (
+                <li key={index}>
+                  <a href={article.url} target="_blank" rel="noopener noreferrer">{article.title}</a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>Loading news articles...</p>
+          )}
         </>
       ) : (
         <form onSubmit={handleLogin}>
